@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Golden Fork | Live on GitHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+    <style>
+        .blur-bg { filter: blur(20px); pointer-events: none; height: 100vh; overflow: hidden; }
+        .hidden { display: none !important; }
+        .cart-bounce { animation: bounce 0.3s ease-in-out; }
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans">
+
+    <div id="auth-modal" class="fixed inset-0 bg-stone-900/90 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-[3rem] p-10 max-w-sm w-full shadow-2xl text-center">
+            <div class="mb-8">
+                <div class="bg-orange-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span class="text-5xl">🍴</span>
+                </div>
+                <h2 class="text-3xl font-black">The Golden Fork</h2>
+                <p class="text-stone-500 mt-2 italic">Sign in with Gmail to start ordering</p>
+            </div>
+            
+            <button id="googleBtn" class="w-full flex items-center justify-center gap-3 bg-white border-2 border-stone-200 py-4 rounded-2xl font-bold hover:border-orange-500 hover:bg-orange-50 transition-all active:scale-95 shadow-sm">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" class="w-6 h-6">
+                Continue with Google
+            </button>
+
+            <p class="text-[10px] text-stone-400 mt-8 uppercase tracking-widest">Live GitHub Deployment</p>
+        </div>
+    </div>
+
+    <div id="main-content" class="blur-bg">
+        <nav class="flex justify-between items-center px-8 py-5 bg-white/80 backdrop-blur-md border-b border-stone-100 sticky top-0 z-50">
+            <h1 class="text-2xl font-black text-orange-600 italic tracking-tighter uppercase">Golden Fork</h1>
+            
+            <div class="flex items-center gap-4">
+                <div id="user-profile" class="hidden flex items-center gap-3 bg-stone-100 p-1 pr-3 rounded-full">
+                    <img id="user-pic" class="w-8 h-8 rounded-full border border-white">
+                    <button onclick="logout()" class="text-[10px] font-bold text-stone-500 hover:text-red-500">LOGOUT</button>
+                </div>
+                
+                <div class="bg-stone-900 text-white px-4 py-2 rounded-full flex items-center gap-2 font-bold">
+                    <span>🛒</span>
+                    <span id="cart-count">0</span>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-4xl mx-auto py-12 px-6">
+            <div class="bg-gradient-to-r from-orange-600 to-orange-500 text-white p-10 rounded-[3rem] mb-12 shadow-2xl shadow-orange-600/20 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                    <h2 class="text-4xl font-black mb-2">Welcome, <span id="welcome-name">Foodie</span>!</h2>
+                    <p class="text-lg opacity-90">Get 20% off on your first GitHub order.</p>
+                </div>
+                <div class="text-6xl animate-pulse">🍛</div>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-8">Our Signature Dishes</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-[2.5rem] border border-stone-100 shadow-sm hover:shadow-xl transition-all group">
+                    <div class="h-48 rounded-[2rem] overflow-hidden mb-4">
+                        <img src="https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-xl">Butter Chicken</h4>
+                        <span class="text-orange-600 font-black bg-orange-50 px-3 py-1 rounded-full">₹420</span>
+                    </div>
+                    <button onclick="addToCart(420)" class="w-full bg-stone-900 text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-colors">Add to Order</button>
+                </div>
+
+                <div class="bg-white p-6 rounded-[2.5rem] border border-stone-100 shadow-sm hover:shadow-xl transition-all group">
+                    <div class="h-48 rounded-[2rem] overflow-hidden mb-4">
+                        <img src="https://images.unsplash.com/photo-1633945274405-b6c8069047b0?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-xl">Hyderabadi Biryani</h4>
+                        <span class="text-orange-600 font-black bg-orange-50 px-3 py-1 rounded-full">₹550</span>
+                    </div>
+                    <button onclick="addToCart(550)" class="w-full bg-stone-900 text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-colors">Add to Order</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 1. FIREBASE CONFIGURATION
+        // REPLACE WITH YOUR ACTUAL KEYS FROM FIREBASE CONSOLE
+        const firebaseConfig = {
+            apiKey: "AIzaSyBje9SL2yJvkNayeCwQghB2ElskDnNYCLw",
+            authDomain: "berestro-4db92.firebaseapp.com",
+            projectId: "berestro-4db92",
+            appId: "1:824573013152:android:f112c3cbc7fd84f60cedc5"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
+
+        // 2. LOGIN LOGIC
+        document.getElementById('googleBtn').addEventListener('click', () => {
+            auth.signInWithPopup(provider)
+                .then((result) => { console.log("User Logged In"); })
+                .catch((error) => { 
+                    alert("Login failed! Ensure your GitHub domain is added to Firebase Authorized Domains. Error: " + error.message); 
+                });
+        });
+
+        // 3. AUTH STATE PERSISTENCE
+        auth.onAuthStateChanged((user) => {
+            const modal = document.getElementById('auth-modal');
+            const main = document.getElementById('main-content');
+            
+            if (user) {
+                modal.classList.add('hidden');
+                main.classList.remove('blur-bg');
+                
+                document.getElementById('user-profile').classList.remove('hidden');
+                document.getElementById('user-name').innerText = user.displayName.split(' ')[0];
+                document.getElementById('welcome-name').innerText = user.displayName.split(' ')[0];
+                document.getElementById('user-pic').src = user.photoURL;
+            } else {
+                modal.classList.remove('hidden');
+                main.classList.add('blur-bg');
+                document.getElementById('user-profile').classList.add('hidden');
+            }
+        });
+
+        // 4. CART LOGIC
+        let count = 0;
+        function addToCart(price) {
+            count++;
+            const cartBadge = document.getElementById('cart-count');
+            cartBadge.innerText = count;
+            cartBadge.parentElement.classList.add('cart-bounce');
+            setTimeout(() => cartBadge.parentElement.classList.remove('cart-bounce'), 300);
+        }
+
+        // 5. LOGOUT
+        function logout() {
+            auth.signOut();
+        }
+    </script>
+</body>
+</html>
