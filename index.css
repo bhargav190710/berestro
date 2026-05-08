@@ -1,0 +1,13 @@
+.blur-bg { filter: blur(25px); pointer-events: none; height: 100vh; overflow: hidden; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.food-card { flex: 0 0 260px; transition: transform 0.2s ease; }
+
+#floating-cart {
+    transform: translateY(150%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#floating-cart.active {
+    transform: translateY(0);
+}
+.hidden { display: none !important; }
