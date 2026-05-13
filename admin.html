@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swadisht - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B0000;
+            --primary-dark: #5C0000;
+            --accent: #FF9933;
+            --accent-hover: #E8851E;
+            --bg: #FFF8F0;
+            --card: #FFFFFF;
+            --text: #2C1810;
+            --text-light: #8B6F5C;
+            --border: #F0E0D0;
+            --green: #138808;
+            --green-light: #E8F5E9;
+            --cream: #FFF5E6;
+            --pending: #FF6B35;
+            --pending-bg: #FFF3E0;
+            --preparing: #2196F3;
+            --preparing-bg: #E3F2FD;
+            --ready: #4CAF50;
+            --ready-bg: #E8F5E9;
+            --served: #9E9E9E;
+            --served-bg: #F5F5F5;
+            --error: #D32F2F;
+            --error-bg: #FFEBEE;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(139,0,0,0.25);
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .brand-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .brand-text span {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,153,51,0.3);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .logout-btn:hover {
+            background: var(--accent);
+            color: var(--primary-dark);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            max-width: 1400px;
+            margin: 1.5rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: 0 4px 15px rgba(139,0,0,0.05);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.pending { background: var(--pending-bg); }
+        .stat-icon.preparing { background: var(--preparing-bg); }
+        .stat-icon.ready { background: var(--ready-bg); }
+        .stat-icon.revenue { background: var(--cream); }
+
+        .stat-info h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .stat-info p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        /* Filter Tabs */
+        .filter-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 0.6rem 1.2rem;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: var(--accent);
+            border-color: var(--primary);
+        }
+
+        .filter-btn .badge {
+            background: var(--accent);
+            color: var(--primary-dark);
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        /* Orders Grid */
+        .orders-container {
+            max-width: 1400px;
+            margin: 1.5rem auto;
+            padding: 0 2rem 3rem;
+        }
+
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(139,0,0,0.08);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .order-card:hover {
+            box-shadow: 0 8px 30px rgba(139,0,0,0.12);
+            transform: translateY(-3px);
+        }
+
+        .order-card.new-order {
+            animation: newOrderPulse 2s ease;
+            border-color: var(--accent);
+        }
+
+        @keyframes newOrderPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,153,51,0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255,153,51,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,153,51,0); }
+        }
+
+        .order-header {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .order-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .order-table {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .order-time {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .order-id {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            opacity: 0.7;
+            font-family: monospace;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .status-badge.pending {
+            background: var(--pending-bg);
+            color: var(--pending);
+        }
+
+        .status-badge.preparing {
+            background: var(--preparing-bg);
+            color: var(--preparing);
+        }
+
+        .status-badge.ready {
+            background: var(--ready-bg);
+            color: var(--ready);
+        }
+
+        .status-badge.served {
+            background: var(--served-bg);
+            color: var(--served);
+        }
+
+        .order-body {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .customer-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .customer-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .customer-email {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .order-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .order-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .order-item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .item-icon {
+            font-size: 1.3rem;
+        }
+
+        .item-name-qty {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        .item-qty {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .item-price {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .special-instructions {
+            background: var(--cream);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            border-left: 3px solid var(--accent);
+        }
+
+        .special-instructions strong {
+            color: var(--primary);
+        }
+
+        .order-footer {
+            padding: 1rem 1.5rem;
+            background: var(--cream);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-total {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .order-total span {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-prepare {
+            background: var(--preparing);
+            color: white;
+        }
+
+        .btn-ready {
+            background: var(--ready);
+            color: white;
+        }
+
+        .btn-serve {
+            background: var(--served);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: var(--error-bg);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(139,0,0,0.3);
+            z-index: 400;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Audio Toggle */
+        .audio-toggle {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,153,51,0.3);
+            color: white;
+            padding: 0.6rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .audio-toggle:hover {
+            background: var(--accent);
+        }
+
+        .audio-toggle.muted {
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header { padding: 1rem; }
+            .brand-text h1 { font-size: 1.2rem; }
+            .stats-bar { padding: 0 1rem; grid-template-columns: repeat(2, 1fr); }
+            .filter-section { padding: 0 1rem; }
+            .orders-container { padding: 0 1rem 2rem; }
+            .orders-grid { grid-template-columns: 1fr; }
+            .order-card { border-radius: 16px; }
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--bg);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .loading-overlay.hidden { display: none; }
+
+        .spinner {
+            width: 50px; height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading Kitchen Dashboard...</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-logo">🍛</div>
+                <div class="brand-text">
+                    <h1>Swadisht</h1>
+                    <span>Kitchen Admin Panel</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    <span>Live Orders</span>
+                </div>
+                <button class="audio-toggle" id="audioToggle" onclick="toggleAudio()" title="Toggle notification sound">
+                    🔊
+                </button>
+                <button class="logout-btn" onclick="logoutAdmin()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar" id="statsBar">
+        <div class="stat-card">
+            <div class="stat-icon pending">⏳</div>
+            <div class="stat-info">
+                <h3 id="pendingCount">0</h3>
+                <p>Pending Orders</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon preparing">👨‍🍳</div>
+            <div class="stat-info">
+                <h3 id="preparingCount">0</h3>
+                <p>Preparing</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon ready">✅</div>
+            <div class="stat-info">
+                <h3 id="readyCount">0</h3>
+                <p>Ready to Serve</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon revenue">💰</div>
+            <div class="stat-info">
+                <h3 id="todayRevenue">₹0</h3>
+                <p>Today's Revenue</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-section">
+        <button class="filter-btn active" onclick="filterOrders('all', this)">
+            All Orders
+            <span class="badge" id="allBadge">0</span>
+        </button>
+        <button class="filter-btn" onclick="filterOrders('pending', this)">
+            ⏳ Pending
+            <span class="badge" id="pendingBadge">0</span>
+        </button>
+        <button class="filter-btn" onclick="filterOrders('preparing', this)">
+            👨‍🍳 Preparing
+            <span class="badge" id="preparingBadge">0</span>
+        </button>
+        <button class="filter-btn" onclick="filterOrders('ready', this)">
+            ✅ Ready
+            <span class="badge" id="readyBadge">0</span>
+        </button>
+        <button class="filter-btn" onclick="filterOrders('served', this)">
+            🍽️ Served
+            <span class="badge" id="servedBadge">0</span>
+        </button>
+    </div>
+
+    <!-- Orders Container -->
+    <div class="orders-container">
+        <div class="orders-grid" id="ordersGrid">
+            <!-- Orders populated by JS -->
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span>🔔</span>
+        <span id="toastMessage">Notification</span>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // FIREBASE CONFIG
+        // ═══════════════════════════════════════════════════════════════
+        const firebaseConfig = {
+            apiKey: "AIzaSyBje9SL2yJvkNayeCwQghB2ElskDnNYCLw",
+            authDomain: "berestro-4db92.firebaseapp.com",
+            projectId: "berestro-4db92",
+            storageBucket: "berestro-4db92.firebasestorage.app",
+            appId: "1:824573013152:web:f112c3cbc7fd84f60cedc5"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ═══════════════════════════════════════════════════════════════
+        // ADMIN AUTH CHECK
+        // ═══════════════════════════════════════════════════════════════
+        const ADMIN_EMAILS = ['admin@swadisht.com']; // Add your admin emails here
+
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                // Not logged in - redirect to login
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Check if user is admin (you can customize this logic)
+            // For now, allow any logged-in user to access admin panel
+            // In production, check against ADMIN_EMAILS array
+
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            startListeningToOrders();
+        });
+
+        function logoutAdmin() {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // AUDIO NOTIFICATION
+        // ═══════════════════════════════════════════════════════════════
+        let audioEnabled = true;
+        let audioContext = null;
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('audioToggle');
+            btn.textContent = audioEnabled ? '🔊' : '🔇';
+            btn.classList.toggle('muted', !audioEnabled);
+            showToast(audioEnabled ? 'Sound notifications ON' : 'Sound notifications OFF');
+        }
+
+        function playNotificationSound() {
+            if (!audioEnabled) return;
+
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log('Audio play failed:', e);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // ORDERS MANAGEMENT
+        // ═══════════════════════════════════════════════════════════════
+        let allOrders = [];
+        let currentFilter = 'all';
+        let lastOrderCount = 0;
+
+        function startListeningToOrders() {
+            // Real-time listener for orders
+            db.collection('orders')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot((snapshot) => {
+                    const orders = [];
+                    snapshot.forEach((doc) => {
+                        orders.push({
+                            id: doc.id,
+                            ...doc.data(),
+                            createdAt: doc.data().createdAt?.toDate() || new Date()
+                        });
+                    });
+
+                    // Check for new orders
+                    const newOrders = orders.filter(o => o.status === 'pending');
+                    if (newOrders.length > lastOrderCount && lastOrderCount > 0) {
+                        playNotificationSound();
+                        showToast(`🔔 New order from Table ${newOrders[0].tableNumber}!`);
+                    }
+                    lastOrderCount = newOrders.length;
+
+                    allOrders = orders;
+                    updateStats();
+                    renderOrders();
+                }, (error) => {
+                    console.error('Error listening to orders:', error);
+                    showToast('Error loading orders. Retrying...', 'error');
+                });
+        }
+
+        function updateStats() {
+            const pending = allOrders.filter(o => o.status === 'pending').length;
+            const preparing = allOrders.filter(o => o.status === 'preparing').length;
+            const ready = allOrders.filter(o => o.status === 'ready').length;
+            const served = allOrders.filter(o => o.status === 'served').length;
+
+            // Calculate today's revenue
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayRevenue = allOrders
+                .filter(o => o.createdAt >= today && o.status !== 'cancelled')
+                .reduce((sum, o) => sum + (o.total || 0), 0);
+
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('preparingCount').textContent = preparing;
+            document.getElementById('readyCount').textContent = ready;
+            document.getElementById('todayRevenue').textContent = `₹${todayRevenue.toLocaleString()}`;
+
+            // Update badges
+            document.getElementById('allBadge').textContent = allOrders.length;
+            document.getElementById('pendingBadge').textContent = pending;
+            document.getElementById('preparingBadge').textContent = preparing;
+            document.getElementById('readyBadge').textContent = ready;
+            document.getElementById('servedBadge').textContent = served;
+        }
+
+        function filterOrders(status, btn) {
+            currentFilter = status;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderOrders();
+        }
+
+        function renderOrders() {
+            const grid = document.getElementById('ordersGrid');
+
+            let filtered = allOrders;
+            if (currentFilter !== 'all') {
+                filtered = allOrders.filter(o => o.status === currentFilter);
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="empty-state-icon">🍽️</div>
+                        <h3>No ${currentFilter === 'all' ? '' : currentFilter} orders</h3>
+                        <p>Orders will appear here when customers place them</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(order => {
+                const timeAgo = getTimeAgo(order.createdAt);
+                const isNew = order.status === 'pending' && (new Date() - order.createdAt) < 60000;
+
+                return `
+                    <div class="order-card ${isNew ? 'new-order' : ''}" data-id="${order.id}">
+                        <div class="order-header">
+                            <div class="order-meta">
+                                <div class="order-table">🪑 Table ${order.tableNumber || '?'}</div>
+                                <div class="order-time">⏱️ ${timeAgo}</div>
+                                <div class="order-id">#${order.id.slice(-6).toUpperCase()}</div>
+                            </div>
+                            <div class="status-badge ${order.status}">
+                                ${getStatusIcon(order.status)} ${order.status}
+                            </div>
+                        </div>
+
+                        <div class="order-body">
+                            <div class="customer-info">
+                                <div class="customer-avatar">👤</div>
+                                <div class="customer-details">
+                                    <div class="customer-name">${order.userName || 'Guest'}</div>
+                                    <div class="customer-email">${order.userEmail || 'No email'}</div>
+                                </div>
+                            </div>
+
+                            <div class="order-items-list">
+                                ${order.items?.map(item => `
+                                    <div class="order-item-row">
+                                        <div class="item-info">
+                                            <span class="item-icon">${getItemIcon(item.category)}</span>
+                                            <div class="item-name-qty">
+                                                <span class="item-name">${item.name}</span>
+                                                <span class="item-qty">Qty: ${item.quantity} × ₹${item.price}</span>
+                                            </div>
+                                        </div>
+                                        <span class="item-price">₹${item.total}</span>
+                                    </div>
+                                `).join('') || '<div style="color: var(--text-light); font-size: 0.9rem;">No items</div>'}
+                            </div>
+
+                            ${order.bread ? `
+                                <div style="margin-top: 0.5rem; padding: 0.5rem; background: var(--cream); border-radius: 8px; font-size: 0.85rem; color: var(--text-light);">
+                                    🫓 <strong>Bread:</strong> ${order.bread}
+                                </div>
+                            ` : ''}
+
+                            ${order.specialInstructions ? `
+                                <div class="special-instructions">
+                                    <strong>📝 Special Instructions:</strong> ${order.specialInstructions}
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="order-footer">
+                            <div class="order-total">
+                                <span>Total</span> ₹${order.total || 0}
+                            </div>
+                            <div class="action-btns">
+                                ${getActionButtons(order)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusIcon(status) {
+            const icons = {
+                'pending': '⏳',
+                'preparing': '👨‍🍳',
+                'ready': '✅',
+                'served': '🍽️',
+                'cancelled': '❌'
+            };
+            return icons[status] || '⏳';
+        }
+
+        function getItemIcon(category) {
+            const icons = {
+                'starters': '🥟',
+                'tandoori': '🔥',
+                'curries': '🍛',
+                'biryani': '🍚',
+                'breads': '🫓',
+                'desserts': '🍨',
+                'beverages': '🍹'
+            };
+            return icons[category] || '🍽️';
+        }
+
+        function getActionButtons(order) {
+            const buttons = [];
+
+            switch(order.status) {
+                case 'pending':
+                    buttons.push(`<button class="action-btn btn-prepare" onclick="updateStatus('${order.id}', 'preparing')">👨‍🍳 Start Preparing</button>`);
+                    buttons.push(`<button class="action-btn btn-cancel" onclick="updateStatus('${order.id}', 'cancelled')">❌ Cancel</button>`);
+                    break;
+                case 'preparing':
+                    buttons.push(`<button class="action-btn btn-ready" onclick="updateStatus('${order.id}', 'ready')">✅ Mark Ready</button>`);
+                    buttons.push(`<button class="action-btn btn-cancel" onclick="updateStatus('${order.id}', 'cancelled')">❌ Cancel</button>`);
+                    break;
+                case 'ready':
+                    buttons.push(`<button class="action-btn btn-serve" onclick="updateStatus('${order.id}', 'served')">🍽️ Mark Served</button>`);
+                    break;
+                case 'served':
+                    buttons.push(`<span style="color: var(--text-light); font-size: 0.85rem; padding: 0.6rem;">✓ Completed</span>`);
+                    break;
+                case 'cancelled':
+                    buttons.push(`<span style="color: var(--error); font-size: 0.85rem; padding: 0.6rem;">❌ Cancelled</span>`);
+                    break;
+            }
+
+            return buttons.join('');
+        }
+
+        function updateStatus(orderId, newStatus) {
+            db.collection('orders').doc(orderId).update({
+                status: newStatus,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                showToast(`Order #${orderId.slice(-6).toUpperCase()} marked as ${newStatus}`);
+            })
+            .catch((error) => {
+                console.error('Error updating status:', error);
+                showToast('Failed to update status', 'error');
+            });
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)} hr ago`;
+            return `${Math.floor(diff / 86400)} days ago`;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    </script>
+</body>
+</html>
